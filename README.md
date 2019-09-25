@@ -1,2 +1,3 @@
 # Logger
-Basic console log in creator
+Basic console login creator
+Logger 2 is improved
