@@ -6,7 +6,7 @@ public class log {
 	private String userword;
 	private int size;
 	private int filled;
-	private ArrayList<ArrayList<String>> logins;
+	private ArrayList<String> logins;
 	
 	public log(String un, String pass, String name) throws FileNotFoundException {
 		userword = hash(un + pass);
@@ -16,21 +16,10 @@ public class log {
 		size = Integer.parseInt(fReader.next());
 		filled = Integer.parseInt(fReader.next());
 		
-		logins = new ArrayList<ArrayList<String>>(size + 1);
-		
-		String hold = "";
+		logins = new ArrayList<String>(size + 1);
 		
 		for(int i = 0; i < size; i++) {
-			logins.add(i, new ArrayList<String>());
-		}
-		
-		for(int i = 0; i < size; i++) {
-			hold = fReader.next();
-			String splHold[] = hold.split(",");
-			
-			for(int j = 0; j < splHold.length; j++) {
-				logins.get(i).add(splHold[j]);
-			}
+			logins.add(fReader.next());
 		}
 		
 		fReader.close();
@@ -42,45 +31,44 @@ public class log {
 			newLog();
 		}		
 		else {
-			for(int i = 0; i < size; i++) {
-				if(logins.get(i).contains(userword)) {
-					System.out.println("Login successful");
+			if(logins.contains(userword)) {
+				System.out.println("Login successful");
+				System.exit(0);
+			}
+			
+			else {
+				System.err.println("No login information found");
+				System.err.println("Create new login? y/n");
+				
+				Scanner kbReader = new Scanner(System.in);
+				
+				if(kbReader.next().equalsIgnoreCase("y")) {
+					newLog();
+					kbReader.close();
+				}
+				else {
+					kbReader.close();
 					System.exit(0);
 				}
-			}
-			
-			Scanner kbReader = new Scanner(System.in);
-			
-			System.err.println("No login information found");
-			System.err.println("Create new login? y/n");
-			
-			if(kbReader.nextLine().equalsIgnoreCase("y")) {
-				newLog();
-				kbReader.close();
-			}
-			else {
-				kbReader.close();
-				System.exit(0);
 			}
 		}
 	}
 	
 	public void newLog() throws FileNotFoundException, InterruptedException {
-		PrintWriter print = new PrintWriter(fileName);
-		
-		if(logins.get(Integer.parseInt(userword)%size).get(0).equals("null")) {
-			logins.get(Integer.parseInt(userword)%size).remove(0);
+		if(filled == size) {
+			System.err.println("Error: Database full");
+			System.exit(0);
 		}
 		
-		logins.get(Integer.parseInt(userword)%size).add(userword);
+		PrintWriter print = new PrintWriter(fileName);
 		
-		print.println(size + " 1");
+		logins.set(filled, userword);
+		filled++;
+		
+		print.println(size + " " + filled);
 		
 		for(int i = 0; i < size; i++) {
-			for(int j = 0; j < logins.get(i).size(); j++) {
-				print.print(logins.get(i).get(j) + ",");
-			}
-			print.println();
+			print.println(logins.get(i));
 		}
 		
 		print.close();
@@ -114,7 +102,7 @@ public class log {
 		print.println(size + " 0");
 		
 		for(int i = 0; i < size; i++) {
-			print.println("null,");
+			print.println("null");
 		}
 		
 		print.close();
